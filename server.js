@@ -1,4 +1,8 @@
 const express = require("express");
+const mongoose = require("mongoose");
+require("dotenv").config();
+
+const Task = require("./models/Task");
 
 const app = express();
 
@@ -10,19 +14,11 @@ app.use((req, res, next) => {
   next();
 });
 
-// In-memory tasks
-let tasks = [
-  {
-    id: 1,
-    title: "Learn Express",
-    completed: false,
-  },
-  {
-    id: 2,
-    title: "Complete Practical 4",
-    completed: false,
-  },
-];
+// MongoDB Connection
+mongoose
+  .connect(process.env.MONGO_URI)
+  .then(() => console.log(" MongoDB Connected"))
+  .catch((err) => console.log(err));
 
 // Home Route
 app.get("/", (req, res) => {
@@ -30,66 +26,102 @@ app.get("/", (req, res) => {
 });
 
 // GET all tasks
-app.get("/tasks", (req, res) => {
-  res.status(200).json(tasks);
+app.get("/tasks", async (req, res, next) => {
+  try {
+    const tasks = await Task.find();
+    res.status(200).json(tasks);
+  } catch (err) {
+    next(err);
+  }
+});
+
+// GET task by ID
+app.get("/tasks/:id", async (req, res, next) => {
+  try {
+    const task = await Task.findById(req.params.id);
+
+    if (!task) {
+      return res.status(404).json({
+        message: "Task not found",
+      });
+    }
+
+    res.status(200).json(task);
+  } catch (err) {
+    next(err);
+  }
 });
 
 // POST new task
-app.post("/tasks", (req, res) => {
-  const newTask = {
-    id: tasks.length + 1,
-    title: req.body.title,
-    completed: false,
-  };
+app.post("/tasks", async (req, res, next) => {
+  try {
+    const task = await Task.create({
+      title: req.body.title,
+      description: req.body.description,
+    });
 
-  tasks.push(newTask);
-
-  res.status(201).json(newTask);
+    res.status(201).json(task);
+  } catch (err) {
+    next(err);
+  }
 });
 
 // PUT update task
-app.put("/tasks/:id", (req, res) => {
-  const id = parseInt(req.params.id);
+app.put("/tasks/:id", async (req, res, next) => {
+  try {
+    const task = await Task.findByIdAndUpdate(
+      req.params.id,
+      {
+        title: req.body.title,
+        description: req.body.description,
+        completed: req.body.completed,
+      },
+      {
+        new: true,
+        runValidators: true,
+      }
+    );
 
-  const task = tasks.find((t) => t.id === id);
+    if (!task) {
+      return res.status(404).json({
+        message: "Task not found",
+      });
+    }
 
-  if (!task) {
-    return res.status(404).json({
-      message: "Task not found",
-    });
+    res.status(200).json(task);
+  } catch (err) {
+    next(err);
   }
-
-  task.title = req.body.title || task.title;
-
-  if (req.body.completed !== undefined) {
-    task.completed = req.body.completed;
-  }
-
-  res.status(200).json(task);
 });
 
 // DELETE task
-app.delete("/tasks/:id", (req, res) => {
-  const id = parseInt(req.params.id);
+app.delete("/tasks/:id", async (req, res, next) => {
+  try {
+    const task = await Task.findByIdAndDelete(req.params.id);
 
-  const index = tasks.findIndex((t) => t.id === id);
+    if (!task) {
+      return res.status(404).json({
+        message: "Task not found",
+      });
+    }
 
-  if (index === -1) {
-    return res.status(404).json({
-      message: "Task not found",
+    res.status(200).json({
+      message: "Task deleted successfully",
     });
+  } catch (err) {
+    next(err);
   }
-
-  tasks.splice(index, 1);
-
-  res.status(200).json({
-    message: "Task deleted successfully",
-  });
 });
 
 // Global Error Handler
 app.use((err, req, res, next) => {
-  console.error(err.stack);
+  console.error(err);
+
+  if (err.name === "ValidationError") {
+    return res.status(400).json({
+      error: err.message,
+    });
+  }
 
   res.status(500).json({
     error: "Something went wrong",
@@ -97,5 +129,5 @@ app.use((err, req, res, next) => {
 });
 
 app.listen(5000, () => {
-  console.log("✅ MY SERVER STARTED ON PORT 5000");
+  console.log(" Server running on port 5000");
 });
