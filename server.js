@@ -1,11 +1,14 @@
 const express = require("express");
 const mongoose = require("mongoose");
+const cors = require("cors");
 require("dotenv").config();
 
 const Task = require("./models/Task");
 
 const app = express();
 
+// Middleware
+app.use(cors());
 app.use(express.json());
 
 // Logging Middleware
@@ -17,7 +20,7 @@ app.use((req, res, next) => {
 // MongoDB Connection
 mongoose
   .connect(process.env.MONGO_URI)
-  .then(() => console.log(" MongoDB Connected"))
+  .then(() => console.log("MongoDB Connected"))
   .catch((err) => console.log(err));
 
 // Home Route
@@ -128,6 +131,7 @@ app.use((err, req, res, next) => {
   });
 });
 
+// Start Server
 app.listen(5000, () => {
-  console.log(" Server running on port 5000");
+  console.log("Server running on port 5000");
 });
