@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Task Manager - Practical 7 Authentication</title>
+  <style>
+    :root {
+      --primary: #4f46e5;
+      --primary-hover: #4338ca;
+      --bg: #0f172a;
+      --card-bg: #1e293b;
+      --card-border: #334155;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --success: #10b981;
+      --danger: #ef4444;
+      --danger-hover: #dc2626;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2rem 1rem;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 650px;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--card-border);
+    }
+
+    .header h1 {
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: #e0e7ff;
+    }
+
+    .user-pill {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      background: #312e81;
+      padding: 0.4rem 0.85rem;
+      border-radius: 9999px;
+      font-size: 0.85rem;
+    }
+
+    .btn-logout {
+      background: #e11d48;
+      color: white;
+      border: none;
+      padding: 0.35rem 0.75rem;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.8rem;
+      font-weight: 600;
+      transition: background 0.2s;
+    }
+
+    .btn-logout:hover {
+      background: #be123c;
+    }
+
+    .card {
+      background-color: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 1.75rem;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+      margin-bottom: 1.5rem;
+    }
+
+    .card h2 {
+      font-size: 1.3rem;
+      margin-bottom: 1.25rem;
+      color: #e2e8f0;
+    }
+
+    .form-group {
+      margin-bottom: 1rem;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 0.35rem;
+      font-size: 0.875rem;
+      color: var(--text-muted);
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border-radius: 8px;
+      border: 1px solid var(--card-border);
+      background-color: #0f172a;
+      color: var(--text-main);
+      font-size: 0.95rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .form-control:focus {
+      border-color: var(--primary);
+    }
+
+    textarea.form-control {
+      resize: vertical;
+      min-height: 70px;
+    }
+
+    .btn {
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+      padding: 0.75rem 1rem;
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+
+    .btn:hover {
+      background-color: var(--primary-hover);
+    }
+
+    .auth-toggle {
+      text-align: center;
+      margin-top: 1rem;
+      font-size: 0.875rem;
+      color: var(--text-muted);
+    }
+
+    .auth-toggle a {
+      color: #818cf8;
+      text-decoration: none;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .auth-toggle a:hover {
+      text-decoration: underline;
+    }
+
+    .alert {
+      padding: 0.75rem 1rem;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+      font-size: 0.875rem;
+    }
+
+    .alert-error {
+      background-color: rgba(239, 68, 68, 0.15);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      color: #fca5a5;
+    }
+
+    .alert-success {
+      background-color: rgba(16, 185, 129, 0.15);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      color: #6ee7b7;
+    }
+
+    .task-list {
+      list-style: none;
+    }
+
+    .task-item {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      padding: 1rem;
+      background: #0f172a;
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      margin-bottom: 0.75rem;
+      transition: border-color 0.2s;
+    }
+
+    .task-item:hover {
+      border-color: #475569;
+    }
+
+    .task-content {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+      flex: 1;
+    }
+
+    .task-checkbox {
+      margin-top: 0.25rem;
+      cursor: pointer;
+      width: 18px;
+      height: 18px;
+    }
+
+    .task-title {
+      font-weight: 600;
+      font-size: 1rem;
+      color: var(--text-main);
+    }
+
+    .task-title.completed {
+      text-decoration: line-through;
+      color: var(--text-muted);
+    }
+
+    .task-desc {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-top: 0.2rem;
+    }
+
+    .task-actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .btn-delete {
+      background: transparent;
+      border: 1px solid #7f1d1d;
+      color: #f87171;
+      padding: 0.35rem 0.65rem;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-delete:hover {
+      background: var(--danger);
+      color: white;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 2rem;
+      color: var(--text-muted);
+      font-size: 0.95rem;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <header class="header">
+      <h1>Task Manager</h1>
+      <div id="userHeader" class="user-pill hidden">
+        <span id="userEmailLabel">user@example.com</span>
+        <button id="logoutBtn" class="btn-logout">Logout</button>
+      </div>
+    </header>
+
+    <!-- Global Alert Message -->
+    <div id="alertBox" class="alert hidden"></div>
+
+    <!-- Auth Container (Login / Register) -->
+    <div id="authSection" class="card">
+      <!-- Login Form -->
+      <div id="loginFormContainer">
+        <h2>Login to Your Account</h2>
+        <form id="loginForm">
+          <div class="form-group">
+            <label for="loginEmail">Email Address</label>
+            <input type="email" id="loginEmail" class="form-control" required placeholder="Enter your email" />
+          </div>
+          <div class="form-group">
+            <label for="loginPassword">Password</label>
+            <input type="password" id="loginPassword" class="form-control" required placeholder="Enter your password" />
+          </div>
+          <button type="submit" class="btn">Login</button>
+        </form>
+        <div class="auth-toggle">
+          Don't have an account? <a id="showRegisterBtn">Register here</a>
+        </div>
+      </div>
+
+      <!-- Register Form -->
+      <div id="registerFormContainer" class="hidden">
+        <h2>Create New Account</h2>
+        <form id="registerForm">
+          <div class="form-group">
+            <label for="registerEmail">Email Address</label>
+            <input type="email" id="registerEmail" class="form-control" required placeholder="Enter your email" />
+          </div>
+          <div class="form-group">
+            <label for="registerPassword">Password</label>
+            <input type="password" id="registerPassword" class="form-control" required placeholder="Create a password" />
+          </div>
+          <button type="submit" class="btn">Register</button>
+        </form>
+        <div class="auth-toggle">
+          Already have an account? <a id="showLoginBtn">Login here</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Task Dashboard Section (Protected) -->
+    <div id="taskSection" class="hidden">
+      <!-- Create Task Card -->
+      <div class="card">
+        <h2>Add New Task</h2>
+        <form id="createTaskForm">
+          <div class="form-group">
+            <label for="taskTitle">Task Title *</label>
+            <input type="text" id="taskTitle" class="form-control" required placeholder="What needs to be done?" />
+          </div>
+          <div class="form-group">
+            <label for="taskDesc">Description (Optional)</label>
+            <textarea id="taskDesc" class="form-control" placeholder="Add additional details..."></textarea>
+          </div>
+          <button type="submit" class="btn">Add Task</button>
+        </form>
+      </div>
+
+      <!-- Task List Card -->
+      <div class="card">
+        <h2>Your Tasks</h2>
+        <ul id="taskList" class="task-list"></ul>
+        <div id="emptyState" class="empty-state hidden">No tasks yet. Create your first task above!</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE = "";
+
+    // DOM Elements
+    const authSection = document.getElementById("authSection");
+    const loginFormContainer = document.getElementById("loginFormContainer");
+    const registerFormContainer = document.getElementById("registerFormContainer");
+    const taskSection = document.getElementById("taskSection");
+    const userHeader = document.getElementById("userHeader");
+    const userEmailLabel = document.getElementById("userEmailLabel");
+    const alertBox = document.getElementById("alertBox");
+
+    const loginForm = document.getElementById("loginForm");
+    const registerForm = document.getElementById("registerForm");
+    const createTaskForm = document.getElementById("createTaskForm");
+    const taskList = document.getElementById("taskList");
+    const emptyState = document.getElementById("emptyState");
+
+    const showRegisterBtn = document.getElementById("showRegisterBtn");
+    const showLoginBtn = document.getElementById("showLoginBtn");
+    const logoutBtn = document.getElementById("logoutBtn");
+
+    // Helper: Show Alert
+    function showAlert(message, type = "error") {
+      alertBox.textContent = message;
+      alertBox.className = `alert alert-${type}`;
+      alertBox.classList.remove("hidden");
+      setTimeout(() => {
+        alertBox.classList.add("hidden");
+      }, 4000);
+    }
+
+    // Helper: Get Stored Token
+    function getToken() {
+      return localStorage.getItem("token");
+    }
+
+    // Helper: Authenticated Fetch
+    async function authFetch(url, options = {}) {
+      const token = getToken();
+      if (!token) {
+        handleLogout("Please log in to continue.");
+        return null;
+      }
+
+      const headers = {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`,
+        ...(options.headers || {}),
+      };
+
+      try {
+        const response = await fetch(`${API_BASE}${url}`, {
+          ...options,
+          headers,
+        });
+
+        // 7. If 401 Unauthorized, clear token and show login UI
+        if (response.status === 401) {
+          handleLogout("Session expired or unauthorized. Please log in again.");
+          return null;
+        }
+
+        return response;
+      } catch (err) {
+        showAlert("Network error. Please check backend connection.", "error");
+        return null;
+      }
+    }
+
+    // UI View Controllers
+    function showAuthUI(view = "login") {
+      authSection.classList.remove("hidden");
+      taskSection.classList.add("hidden");
+      userHeader.classList.add("hidden");
+
+      if (view === "register") {
+        loginFormContainer.classList.add("hidden");
+        registerFormContainer.classList.remove("hidden");
+      } else {
+        loginFormContainer.classList.remove("hidden");
+        registerFormContainer.classList.add("hidden");
+      }
+    }
+
+    function showDashboardUI(email) {
+      authSection.classList.add("hidden");
+      taskSection.classList.remove("hidden");
+      userHeader.classList.remove("hidden");
+      userEmailLabel.textContent = email || "User";
+      loadTasks();
+    }
+
+    // 6. Logout Mechanism
+    function handleLogout(message = "") {
+      localStorage.removeItem("token");
+      localStorage.removeItem("userEmail");
+      showAuthUI("login");
+      if (message) {
+        showAlert(message, "error");
+      }
+    }
+
+    // Event: Switch to Register
+    showRegisterBtn.addEventListener("click", () => showAuthUI("register"));
+
+    // Event: Switch to Login
+    showLoginBtn.addEventListener("click", () => showAuthUI("login"));
+
+    // Event: Logout Button
+    logoutBtn.addEventListener("click", () => {
+      handleLogout("Logged out successfully.");
+    });
+
+    // 1. Register API Call
+    registerForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const email = document.getElementById("registerEmail").value.trim();
+      const password = document.getElementById("registerPassword").value;
+
+      try {
+        const res = await fetch(`${API_BASE}/register`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, password }),
+        });
+
+        const data = await res.json();
+        if (res.status === 201) {
+          showAlert("Registration successful! Please login.", "success");
+          registerForm.reset();
+          showAuthUI("login");
+        } else {
+          showAlert(data.message || "Registration failed.", "error");
+        }
+      } catch (err) {
+        showAlert("Failed to connect to the server.", "error");
+      }
+    });
+
+    // 2 & 3. Login API Call & Store JWT
+    loginForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const email = document.getElementById("loginEmail").value.trim();
+      const password = document.getElementById("loginPassword").value;
+
+      try {
+        const res = await fetch(`${API_BASE}/login`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, password }),
+        });
+
+        const data = await res.json();
+        if (res.status === 200 && data.token) {
+          // Store token in localStorage
+          localStorage.setItem("token", data.token);
+          localStorage.setItem("userEmail", (data.user && data.user.email) || email);
+          loginForm.reset();
+          showAlert("Login successful!", "success");
+          showDashboardUI(localStorage.getItem("userEmail"));
+        } else {
+          showAlert(data.message || "Invalid credentials.", "error");
+        }
+      } catch (err) {
+        showAlert("Failed to connect to the server.", "error");
+      }
+    });
+
+    // 4 & 5. Load Tasks using Bearer Token
+    async function loadTasks() {
+      const res = await authFetch("/tasks", { method: "GET" });
+      if (!res) return;
+
+      if (res.ok) {
+        const tasks = await res.json();
+        renderTasks(tasks);
+      } else {
+        showAlert("Failed to load tasks.", "error");
+      }
+    }
+
+    // Render Tasks
+    function renderTasks(tasks) {
+      taskList.innerHTML = "";
+      if (!tasks || tasks.length === 0) {
+        emptyState.classList.remove("hidden");
+        return;
+      }
+
+      emptyState.classList.add("hidden");
+      tasks.forEach((task) => {
+        const li = document.createElement("li");
+        li.className = "task-item";
+
+        li.innerHTML = `
+          <div class="task-content">
+            <input 
+              type="checkbox" 
+              class="task-checkbox" 
+              ${task.completed ? "checked" : ""} 
+              onchange="toggleTask('${task._id}', ${task.completed})"
+            />
+            <div>
+              <div class="task-title ${task.completed ? "completed" : ""}">${escapeHtml(task.title)}</div>
+              ${task.description ? `<div class="task-desc">${escapeHtml(task.description)}</div>` : ""}
+            </div>
+          </div>
+          <div class="task-actions">
+            <button class="btn-delete" onclick="deleteTask('${task._id}')">Delete</button>
+          </div>
+        `;
+        taskList.appendChild(li);
+      });
+    }
+
+    // Create Task
+    createTaskForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const title = document.getElementById("taskTitle").value.trim();
+      const description = document.getElementById("taskDesc").value.trim();
+
+      const res = await authFetch("/tasks", {
+        method: "POST",
+        body: JSON.stringify({ title, description }),
+      });
+
+      if (res && res.status === 201) {
+        createTaskForm.reset();
+        loadTasks();
+      } else if (res) {
+        const data = await res.json();
+        showAlert(data.message || "Failed to create task.", "error");
+      }
+    });
+
+    // Toggle Task Completion
+    window.toggleTask = async function (id, currentStatus) {
+      const res = await authFetch(`/tasks/${id}`, {
+        method: "PUT",
+        body: JSON.stringify({ completed: !currentStatus }),
+      });
+
+      if (res && res.ok) {
+        loadTasks();
+      } else if (res) {
+        const data = await res.json();
+        showAlert(data.message || "Failed to update task.", "error");
+      }
+    };
+
+    // Delete Task
+    window.deleteTask = async function (id) {
+      const res = await authFetch(`/tasks/${id}`, {
+        method: "DELETE",
+      });
+
+      if (res && res.ok) {
+        loadTasks();
+      } else if (res) {
+        const data = await res.json();
+        showAlert(data.message || "Failed to delete task.", "error");
+      }
+    };
+
+    // Helper: Escape HTML for security
+    function escapeHtml(text) {
+      if (!text) return "";
+      return text
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    // Init: Check existing session on load
+    window.addEventListener("DOMContentLoaded", async () => {
+      const token = getToken();
+      if (token) {
+        // Verify with /me
+        const res = await authFetch("/me", { method: "GET" });
+        if (res && res.ok) {
+          const data = await res.json();
+          showDashboardUI(data.user ? data.user.email : localStorage.getItem("userEmail"));
+        } else {
+          handleLogout();
+        }
+      } else {
+        showAuthUI("login");
+      }
+    });
+  </script>
+</body>
+</html>
