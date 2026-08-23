@@ -3,14 +3,21 @@ const mongoose = require("mongoose");
 const taskSchema = new mongoose.Schema({
   title: {
     type: String,
-    required: true,
+    required: [true, "Title is required"],
+    trim: true,
   },
   description: {
     type: String,
+    trim: true,
   },
   completed: {
     type: Boolean,
     default: false,
+  },
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    required: [true, "User is required"],
   },
   createdAt: {
     type: Date,

@@ -1,9 +1,11 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Task Manager - Practical 7 Authentication</title>
+  <title>Task Manager</title>
+
   <style>
     :root {
       --primary: #4f46e5;
@@ -15,14 +17,13 @@
       --text-muted: #94a3b8;
       --success: #10b981;
       --danger: #ef4444;
-      --danger-hover: #dc2626;
     }
 
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      font-family: "Segoe UI", system-ui, sans-serif;
     }
 
     body {
@@ -51,7 +52,6 @@
 
     .header h1 {
       font-size: 1.6rem;
-      font-weight: 700;
       color: #e0e7ff;
     }
 
@@ -72,9 +72,7 @@
       padding: 0.35rem 0.75rem;
       border-radius: 6px;
       cursor: pointer;
-      font-size: 0.8rem;
       font-weight: 600;
-      transition: background 0.2s;
     }
 
     .btn-logout:hover {
@@ -116,7 +114,6 @@
       color: var(--text-main);
       font-size: 0.95rem;
       outline: none;
-      transition: border-color 0.2s;
     }
 
     .form-control:focus {
@@ -129,9 +126,6 @@
     }
 
     .btn {
-      display: inline-flex;
-      justify-content: center;
-      align-items: center;
       width: 100%;
       padding: 0.75rem 1rem;
       background-color: var(--primary);
@@ -141,7 +135,6 @@
       font-size: 0.95rem;
       font-weight: 600;
       cursor: pointer;
-      transition: background-color 0.2s;
     }
 
     .btn:hover {
@@ -162,10 +155,6 @@
       cursor: pointer;
     }
 
-    .auth-toggle a:hover {
-      text-decoration: underline;
-    }
-
     .alert {
       padding: 0.75rem 1rem;
       border-radius: 8px;
@@ -174,13 +163,13 @@
     }
 
     .alert-error {
-      background-color: rgba(239, 68, 68, 0.15);
+      background: rgba(239, 68, 68, 0.15);
       border: 1px solid rgba(239, 68, 68, 0.3);
       color: #fca5a5;
     }
 
     .alert-success {
-      background-color: rgba(16, 185, 129, 0.15);
+      background: rgba(16, 185, 129, 0.15);
       border: 1px solid rgba(16, 185, 129, 0.3);
       color: #6ee7b7;
     }
@@ -198,11 +187,6 @@
       border: 1px solid var(--card-border);
       border-radius: 8px;
       margin-bottom: 0.75rem;
-      transition: border-color 0.2s;
-    }
-
-    .task-item:hover {
-      border-color: #475569;
     }
 
     .task-content {
@@ -222,7 +206,6 @@
     .task-title {
       font-weight: 600;
       font-size: 1rem;
-      color: var(--text-main);
     }
 
     .task-title.completed {
@@ -236,20 +219,13 @@
       margin-top: 0.2rem;
     }
 
-    .task-actions {
-      display: flex;
-      gap: 0.5rem;
-    }
-
     .btn-delete {
       background: transparent;
       border: 1px solid #7f1d1d;
       color: #f87171;
       padding: 0.35rem 0.65rem;
       border-radius: 6px;
-      font-size: 0.8rem;
       cursor: pointer;
-      transition: all 0.2s;
     }
 
     .btn-delete:hover {
@@ -261,7 +237,6 @@
       text-align: center;
       padding: 2rem;
       color: var(--text-muted);
-      font-size: 0.95rem;
     }
 
     .hidden {
@@ -269,380 +244,1017 @@
     }
   </style>
 </head>
+
 <body>
-  <div class="container">
-    <!-- Header -->
-    <header class="header">
-      <h1>Task Manager</h1>
-      <div id="userHeader" class="user-pill hidden">
-        <span id="userEmailLabel">user@example.com</span>
-        <button id="logoutBtn" class="btn-logout">Logout</button>
-      </div>
-    </header>
 
-    <!-- Global Alert Message -->
-    <div id="alertBox" class="alert hidden"></div>
+<div class="container">
 
-    <!-- Auth Container (Login / Register) -->
-    <div id="authSection" class="card">
-      <!-- Login Form -->
-      <div id="loginFormContainer">
-        <h2>Login to Your Account</h2>
-        <form id="loginForm">
-          <div class="form-group">
-            <label for="loginEmail">Email Address</label>
-            <input type="email" id="loginEmail" class="form-control" required placeholder="Enter your email" />
-          </div>
-          <div class="form-group">
-            <label for="loginPassword">Password</label>
-            <input type="password" id="loginPassword" class="form-control" required placeholder="Enter your password" />
-          </div>
-          <button type="submit" class="btn">Login</button>
-        </form>
-        <div class="auth-toggle">
-          Don't have an account? <a id="showRegisterBtn">Register here</a>
+  <header class="header">
+    <h1>Task Manager</h1>
+
+    <div id="userHeader" class="user-pill hidden">
+      <span id="userEmailLabel">user@example.com</span>
+      <button id="logoutBtn" class="btn-logout">Logout</button>
+    </div>
+  </header>
+
+  <div id="alertBox" class="alert hidden"></div>
+
+  <!-- AUTH -->
+  <div id="authSection" class="card">
+
+    <!-- LOGIN -->
+    <div id="loginFormContainer">
+
+      <h2>Login to Your Account</h2>
+
+      <form id="loginForm">
+
+        <div class="form-group">
+          <label for="loginEmail">Email Address</label>
+
+          <input
+            type="email"
+            id="loginEmail"
+            class="form-control"
+            required
+            placeholder="Enter your email"
+          />
         </div>
+
+        <div class="form-group">
+          <label for="loginPassword">Password</label>
+
+          <input
+            type="password"
+            id="loginPassword"
+            class="form-control"
+            required
+            placeholder="Enter your password"
+          />
+        </div>
+
+        <button type="submit" class="btn">Login</button>
+
+      </form>
+
+      <div class="auth-toggle">
+        Don't have an account?
+        <a id="showRegisterBtn">Register here</a>
       </div>
 
-      <!-- Register Form -->
-      <div id="registerFormContainer" class="hidden">
-        <h2>Create New Account</h2>
-        <form id="registerForm">
-          <div class="form-group">
-            <label for="registerEmail">Email Address</label>
-            <input type="email" id="registerEmail" class="form-control" required placeholder="Enter your email" />
-          </div>
-          <div class="form-group">
-            <label for="registerPassword">Password</label>
-            <input type="password" id="registerPassword" class="form-control" required placeholder="Create a password" />
-          </div>
-          <button type="submit" class="btn">Register</button>
-        </form>
-        <div class="auth-toggle">
-          Already have an account? <a id="showLoginBtn">Login here</a>
-        </div>
-      </div>
     </div>
 
-    <!-- Task Dashboard Section (Protected) -->
-    <div id="taskSection" class="hidden">
-      <!-- Create Task Card -->
-      <div class="card">
-        <h2>Add New Task</h2>
-        <form id="createTaskForm">
-          <div class="form-group">
-            <label for="taskTitle">Task Title *</label>
-            <input type="text" id="taskTitle" class="form-control" required placeholder="What needs to be done?" />
-          </div>
-          <div class="form-group">
-            <label for="taskDesc">Description (Optional)</label>
-            <textarea id="taskDesc" class="form-control" placeholder="Add additional details..."></textarea>
-          </div>
-          <button type="submit" class="btn">Add Task</button>
-        </form>
+    <!-- REGISTER -->
+    <div id="registerFormContainer" class="hidden">
+
+      <h2>Create New Account</h2>
+
+      <form id="registerForm">
+
+        <div class="form-group">
+          <label for="registerEmail">Email Address</label>
+
+          <input
+            type="email"
+            id="registerEmail"
+            class="form-control"
+            required
+            placeholder="Enter your email"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="registerPassword">Password</label>
+
+          <input
+            type="password"
+            id="registerPassword"
+            class="form-control"
+            required
+            placeholder="Create a password"
+          />
+        </div>
+
+        <button type="submit" class="btn">Register</button>
+
+      </form>
+
+      <div class="auth-toggle">
+        Already have an account?
+        <a id="showLoginBtn">Login here</a>
       </div>
 
-      <!-- Task List Card -->
-      <div class="card">
-        <h2>Your Tasks</h2>
-        <ul id="taskList" class="task-list"></ul>
-        <div id="emptyState" class="empty-state hidden">No tasks yet. Create your first task above!</div>
-      </div>
     </div>
+
   </div>
 
-  <script>
-    const API_BASE = "";
+  <!-- TASK DASHBOARD -->
+  <div id="taskSection" class="hidden">
 
-    // DOM Elements
-    const authSection = document.getElementById("authSection");
-    const loginFormContainer = document.getElementById("loginFormContainer");
-    const registerFormContainer = document.getElementById("registerFormContainer");
-    const taskSection = document.getElementById("taskSection");
-    const userHeader = document.getElementById("userHeader");
-    const userEmailLabel = document.getElementById("userEmailLabel");
-    const alertBox = document.getElementById("alertBox");
+    <!-- CREATE TASK -->
+    <div class="card">
 
-    const loginForm = document.getElementById("loginForm");
-    const registerForm = document.getElementById("registerForm");
-    const createTaskForm = document.getElementById("createTaskForm");
-    const taskList = document.getElementById("taskList");
-    const emptyState = document.getElementById("emptyState");
+      <h2>Add New Task</h2>
 
-    const showRegisterBtn = document.getElementById("showRegisterBtn");
-    const showLoginBtn = document.getElementById("showLoginBtn");
-    const logoutBtn = document.getElementById("logoutBtn");
+      <form id="createTaskForm">
 
-    // Helper: Show Alert
-    function showAlert(message, type = "error") {
-      alertBox.textContent = message;
-      alertBox.className = `alert alert-${type}`;
-      alertBox.classList.remove("hidden");
-      setTimeout(() => {
-        alertBox.classList.add("hidden");
-      }, 4000);
+        <div class="form-group">
+
+          <label for="taskTitle">Task Title *</label>
+
+          <input
+            type="text"
+            id="taskTitle"
+            class="form-control"
+            required
+            placeholder="What needs to be done?"
+          />
+
+        </div>
+
+        <div class="form-group">
+
+          <label for="taskDesc">Description (Optional)</label>
+
+          <textarea
+            id="taskDesc"
+            class="form-control"
+            placeholder="Add additional details..."
+          ></textarea>
+
+        </div>
+
+        <button type="submit" class="btn">
+          Add Task
+        </button>
+
+      </form>
+
+    </div>
+
+    <!-- TASK LIST -->
+    <div class="card">
+
+      <h2>Your Tasks</h2>
+
+      <ul id="taskList" class="task-list"></ul>
+
+      <div id="emptyState" class="empty-state hidden">
+        No tasks yet. Create your first task above!
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+
+  /*
+   * IMPORTANT:
+   * Your Express server is running on port 5000.
+   */
+  const API_BASE = "http://localhost:5000";
+
+
+  // -----------------------------
+  // DOM ELEMENTS
+  // -----------------------------
+
+  const authSection = document.getElementById("authSection");
+  const loginFormContainer = document.getElementById("loginFormContainer");
+  const registerFormContainer =
+    document.getElementById("registerFormContainer");
+
+  const taskSection = document.getElementById("taskSection");
+
+  const userHeader = document.getElementById("userHeader");
+  const userEmailLabel = document.getElementById("userEmailLabel");
+
+  const alertBox = document.getElementById("alertBox");
+
+  const loginForm = document.getElementById("loginForm");
+  const registerForm = document.getElementById("registerForm");
+  const createTaskForm = document.getElementById("createTaskForm");
+
+  const taskList = document.getElementById("taskList");
+  const emptyState = document.getElementById("emptyState");
+
+  const showRegisterBtn =
+    document.getElementById("showRegisterBtn");
+
+  const showLoginBtn =
+    document.getElementById("showLoginBtn");
+
+  const logoutBtn =
+    document.getElementById("logoutBtn");
+
+
+  // -----------------------------
+  // ALERT
+  // -----------------------------
+
+  function showAlert(message, type = "error") {
+
+    alertBox.textContent = message;
+
+    alertBox.className =
+      `alert alert-${type}`;
+
+    alertBox.classList.remove("hidden");
+
+    setTimeout(() => {
+      alertBox.classList.add("hidden");
+    }, 4000);
+  }
+
+
+  // -----------------------------
+  // TOKEN
+  // -----------------------------
+
+  function getToken() {
+    return localStorage.getItem("token");
+  }
+
+
+  // -----------------------------
+  // AUTHENTICATED REQUEST
+  // -----------------------------
+
+  async function authFetch(url, options = {}) {
+
+    const token = getToken();
+
+    if (!token) {
+
+      handleLogout("Please log in to continue.");
+
+      return null;
     }
 
-    // Helper: Get Stored Token
-    function getToken() {
-      return localStorage.getItem("token");
-    }
+    const headers = {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${token}`,
+      ...(options.headers || {})
+    };
 
-    // Helper: Authenticated Fetch
-    async function authFetch(url, options = {}) {
-      const token = getToken();
-      if (!token) {
-        handleLogout("Please log in to continue.");
-        return null;
-      }
+    try {
 
-      const headers = {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`,
-        ...(options.headers || {}),
-      };
+      console.log("API Request:", `${API_BASE}${url}`);
 
-      try {
-        const response = await fetch(`${API_BASE}${url}`, {
+      const response = await fetch(
+        `${API_BASE}${url}`,
+        {
           ...options,
-          headers,
-        });
-
-        // 7. If 401 Unauthorized, clear token and show login UI
-        if (response.status === 401) {
-          handleLogout("Session expired or unauthorized. Please log in again.");
-          return null;
+          headers
         }
+      );
 
-        return response;
-      } catch (err) {
-        showAlert("Network error. Please check backend connection.", "error");
+      console.log(
+        "API Response:",
+        response.status,
+        `${API_BASE}${url}`
+      );
+
+      if (response.status === 401) {
+
+        handleLogout(
+          "Session expired or unauthorized. Please log in again."
+        );
+
         return null;
       }
+
+      return response;
+
+    } catch (error) {
+
+      console.error("API ERROR:", error);
+
+      showAlert(
+        "Network error. Please check backend connection.",
+        "error"
+      );
+
+      return null;
     }
+  }
 
-    // UI View Controllers
-    function showAuthUI(view = "login") {
-      authSection.classList.remove("hidden");
-      taskSection.classList.add("hidden");
-      userHeader.classList.add("hidden");
 
-      if (view === "register") {
-        loginFormContainer.classList.add("hidden");
-        registerFormContainer.classList.remove("hidden");
-      } else {
-        loginFormContainer.classList.remove("hidden");
-        registerFormContainer.classList.add("hidden");
-      }
+  // -----------------------------
+  // SHOW LOGIN / REGISTER
+  // -----------------------------
+
+  function showAuthUI(view = "login") {
+
+    authSection.classList.remove("hidden");
+
+    taskSection.classList.add("hidden");
+
+    userHeader.classList.add("hidden");
+
+    if (view === "register") {
+
+      loginFormContainer.classList.add("hidden");
+
+      registerFormContainer.classList.remove("hidden");
+
+    } else {
+
+      loginFormContainer.classList.remove("hidden");
+
+      registerFormContainer.classList.add("hidden");
     }
+  }
 
-    function showDashboardUI(email) {
-      authSection.classList.add("hidden");
-      taskSection.classList.remove("hidden");
-      userHeader.classList.remove("hidden");
-      userEmailLabel.textContent = email || "User";
-      loadTasks();
+
+  // -----------------------------
+  // SHOW DASHBOARD
+  // -----------------------------
+
+  function showDashboardUI(email) {
+
+    authSection.classList.add("hidden");
+
+    taskSection.classList.remove("hidden");
+
+    userHeader.classList.remove("hidden");
+
+    userEmailLabel.textContent =
+      email || "User";
+
+    loadTasks();
+  }
+
+
+  // -----------------------------
+  // LOGOUT
+  // -----------------------------
+
+  function handleLogout(message = "") {
+
+    localStorage.removeItem("token");
+
+    localStorage.removeItem("userEmail");
+
+    showAuthUI("login");
+
+    if (message) {
+
+      showAlert(message, "error");
     }
+  }
 
-    // 6. Logout Mechanism
-    function handleLogout(message = "") {
-      localStorage.removeItem("token");
-      localStorage.removeItem("userEmail");
-      showAuthUI("login");
-      if (message) {
-        showAlert(message, "error");
-      }
-    }
 
-    // Event: Switch to Register
-    showRegisterBtn.addEventListener("click", () => showAuthUI("register"));
+  // -----------------------------
+  // SWITCH TO REGISTER
+  // -----------------------------
 
-    // Event: Switch to Login
-    showLoginBtn.addEventListener("click", () => showAuthUI("login"));
+  showRegisterBtn.addEventListener(
+    "click",
+    () => showAuthUI("register")
+  );
 
-    // Event: Logout Button
-    logoutBtn.addEventListener("click", () => {
-      handleLogout("Logged out successfully.");
-    });
 
-    // 1. Register API Call
-    registerForm.addEventListener("submit", async (e) => {
+  // -----------------------------
+  // SWITCH TO LOGIN
+  // -----------------------------
+
+  showLoginBtn.addEventListener(
+    "click",
+    () => showAuthUI("login")
+  );
+
+
+  // -----------------------------
+  // LOGOUT BUTTON
+  // -----------------------------
+
+  logoutBtn.addEventListener(
+    "click",
+    () => handleLogout("Logged out successfully.")
+  );
+
+
+  // -----------------------------
+  // REGISTER
+  // Backend:
+  // POST /auth/register
+  // -----------------------------
+
+  registerForm.addEventListener(
+    "submit",
+    async (e) => {
+
       e.preventDefault();
-      const email = document.getElementById("registerEmail").value.trim();
-      const password = document.getElementById("registerPassword").value;
+
+      const email =
+        document.getElementById("registerEmail")
+          .value
+          .trim();
+
+      const password =
+        document.getElementById("registerPassword")
+          .value;
 
       try {
-        const res = await fetch(`${API_BASE}/register`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email, password }),
-        });
 
-        const data = await res.json();
-        if (res.status === 201) {
-          showAlert("Registration successful! Please login.", "success");
+        const response = await fetch(
+          `${API_BASE}/auth/register`,
+          {
+            method: "POST",
+
+            headers: {
+              "Content-Type": "application/json"
+            },
+
+            body: JSON.stringify({
+              email,
+              password
+            })
+          }
+        );
+
+        const data = await response.json();
+
+        console.log(
+          "REGISTER:",
+          response.status,
+          data
+        );
+
+        if (response.ok) {
+
+          showAlert(
+            "Registration successful! Please login.",
+            "success"
+          );
+
           registerForm.reset();
+
           showAuthUI("login");
+
         } else {
-          showAlert(data.message || "Registration failed.", "error");
+
+          showAlert(
+            data.message ||
+            data.error ||
+            "Registration failed.",
+            "error"
+          );
         }
-      } catch (err) {
-        showAlert("Failed to connect to the server.", "error");
-      }
-    });
 
-    // 2 & 3. Login API Call & Store JWT
-    loginForm.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const email = document.getElementById("loginEmail").value.trim();
-      const password = document.getElementById("loginPassword").value;
+      } catch (error) {
 
-      try {
-        const res = await fetch(`${API_BASE}/login`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email, password }),
-        });
+        console.error(
+          "REGISTER ERROR:",
+          error
+        );
 
-        const data = await res.json();
-        if (res.status === 200 && data.token) {
-          // Store token in localStorage
-          localStorage.setItem("token", data.token);
-          localStorage.setItem("userEmail", (data.user && data.user.email) || email);
-          loginForm.reset();
-          showAlert("Login successful!", "success");
-          showDashboardUI(localStorage.getItem("userEmail"));
-        } else {
-          showAlert(data.message || "Invalid credentials.", "error");
-        }
-      } catch (err) {
-        showAlert("Failed to connect to the server.", "error");
-      }
-    });
-
-    // 4 & 5. Load Tasks using Bearer Token
-    async function loadTasks() {
-      const res = await authFetch("/tasks", { method: "GET" });
-      if (!res) return;
-
-      if (res.ok) {
-        const tasks = await res.json();
-        renderTasks(tasks);
-      } else {
-        showAlert("Failed to load tasks.", "error");
+        showAlert(
+          "Failed to connect to the server.",
+          "error"
+        );
       }
     }
+  );
 
-    // Render Tasks
-    function renderTasks(tasks) {
-      taskList.innerHTML = "";
-      if (!tasks || tasks.length === 0) {
-        emptyState.classList.remove("hidden");
+
+  // -----------------------------
+  // LOGIN
+  // Backend:
+  // POST /auth/login
+  // -----------------------------
+
+  loginForm.addEventListener(
+    "submit",
+    async (e) => {
+
+      e.preventDefault();
+
+      const email =
+        document.getElementById("loginEmail")
+          .value
+          .trim();
+
+      const password =
+        document.getElementById("loginPassword")
+          .value;
+
+      try {
+
+        const response = await fetch(
+          `${API_BASE}/auth/login`,
+          {
+            method: "POST",
+
+            headers: {
+              "Content-Type": "application/json"
+            },
+
+            body: JSON.stringify({
+              email,
+              password
+            })
+          }
+        );
+
+        const data = await response.json();
+
+        console.log(
+          "LOGIN:",
+          response.status,
+          data
+        );
+
+        if (
+          response.ok &&
+          data.token
+        ) {
+
+          localStorage.setItem(
+            "token",
+            data.token
+          );
+
+          const emailFromServer =
+            data.user &&
+            data.user.email
+              ? data.user.email
+              : email;
+
+          localStorage.setItem(
+            "userEmail",
+            emailFromServer
+          );
+
+          loginForm.reset();
+
+          showAlert(
+            "Login successful!",
+            "success"
+          );
+
+          showDashboardUI(
+            emailFromServer
+          );
+
+        } else {
+
+          showAlert(
+            data.message ||
+            data.error ||
+            "Invalid credentials.",
+            "error"
+          );
+        }
+
+      } catch (error) {
+
+        console.error(
+          "LOGIN ERROR:",
+          error
+        );
+
+        showAlert(
+          "Failed to connect to the server.",
+          "error"
+        );
+      }
+    }
+  );
+
+
+  // -----------------------------
+  // GET TASKS
+  // Backend:
+  // GET /tasks
+  // -----------------------------
+
+  async function loadTasks() {
+
+    console.log("Loading tasks...");
+
+    const response =
+      await authFetch(
+        "/tasks",
+        {
+          method: "GET"
+        }
+      );
+
+    if (!response) {
+      return;
+    }
+
+    if (response.ok) {
+
+      const tasks =
+        await response.json();
+
+      console.log(
+        "TASKS:",
+        tasks
+      );
+
+      renderTasks(tasks);
+
+    } else {
+
+      const data =
+        await response.json()
+          .catch(() => ({}));
+
+      showAlert(
+        data.message ||
+        data.error ||
+        "Failed to load tasks.",
+        "error"
+      );
+    }
+  }
+
+
+  // -----------------------------
+  // RENDER TASKS
+  // -----------------------------
+
+  function renderTasks(tasks) {
+
+    taskList.innerHTML = "";
+
+    if (
+      !tasks ||
+      tasks.length === 0
+    ) {
+
+      emptyState.classList.remove(
+        "hidden"
+      );
+
+      return;
+    }
+
+    emptyState.classList.add(
+      "hidden"
+    );
+
+    tasks.forEach(
+      (task) => {
+
+        const li =
+          document.createElement("li");
+
+        li.className =
+          "task-item";
+
+        li.innerHTML = `
+
+          <div class="task-content">
+
+            <input
+              type="checkbox"
+              class="task-checkbox"
+              ${task.completed ? "checked" : ""}
+              onchange="toggleTask(
+                '${task._id}',
+                ${task.completed}
+              )"
+            />
+
+            <div>
+
+              <div
+                class="task-title ${
+                  task.completed
+                    ? "completed"
+                    : ""
+                }"
+              >
+                ${escapeHtml(task.title)}
+              </div>
+
+              ${
+                task.description
+                  ? `
+                    <div class="task-desc">
+                      ${escapeHtml(
+                        task.description
+                      )}
+                    </div>
+                  `
+                  : ""
+              }
+
+            </div>
+
+          </div>
+
+          <div class="task-actions">
+
+            <button
+              class="btn-delete"
+              onclick="deleteTask('${task._id}')"
+            >
+              Delete
+            </button>
+
+          </div>
+
+        `;
+
+        taskList.appendChild(li);
+      }
+    );
+  }
+
+
+  // -----------------------------
+  // CREATE TASK
+  // Backend:
+  // POST /tasks
+  // -----------------------------
+
+  createTaskForm.addEventListener(
+    "submit",
+    async (e) => {
+
+      e.preventDefault();
+
+      const title =
+        document.getElementById("taskTitle")
+          .value
+          .trim();
+
+      const description =
+        document.getElementById("taskDesc")
+          .value
+          .trim();
+
+      if (!title) {
+
+        showAlert(
+          "Task title is required.",
+          "error"
+        );
+
         return;
       }
 
-      emptyState.classList.add("hidden");
-      tasks.forEach((task) => {
-        const li = document.createElement("li");
-        li.className = "task-item";
+      console.log(
+        "Creating task:",
+        {
+          title,
+          description
+        }
+      );
 
-        li.innerHTML = `
-          <div class="task-content">
-            <input 
-              type="checkbox" 
-              class="task-checkbox" 
-              ${task.completed ? "checked" : ""} 
-              onchange="toggleTask('${task._id}', ${task.completed})"
-            />
-            <div>
-              <div class="task-title ${task.completed ? "completed" : ""}">${escapeHtml(task.title)}</div>
-              ${task.description ? `<div class="task-desc">${escapeHtml(task.description)}</div>` : ""}
-            </div>
-          </div>
-          <div class="task-actions">
-            <button class="btn-delete" onclick="deleteTask('${task._id}')">Delete</button>
-          </div>
-        `;
-        taskList.appendChild(li);
-      });
-    }
+      const response =
+        await authFetch(
+          "/tasks",
+          {
+            method: "POST",
 
-    // Create Task
-    createTaskForm.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const title = document.getElementById("taskTitle").value.trim();
-      const description = document.getElementById("taskDesc").value.trim();
+            body: JSON.stringify({
+              title,
+              description,
+              completed: false
+            })
+          }
+        );
 
-      const res = await authFetch("/tasks", {
-        method: "POST",
-        body: JSON.stringify({ title, description }),
-      });
+      if (!response) {
+        return;
+      }
 
-      if (res && res.status === 201) {
+      const data =
+        await response.json()
+          .catch(() => ({}));
+
+      console.log(
+        "CREATE TASK RESPONSE:",
+        response.status,
+        data
+      );
+
+      if (response.ok) {
+
         createTaskForm.reset();
-        loadTasks();
-      } else if (res) {
-        const data = await res.json();
-        showAlert(data.message || "Failed to create task.", "error");
+
+        showAlert(
+          "Task created successfully!",
+          "success"
+        );
+
+        await loadTasks();
+
+      } else {
+
+        showAlert(
+          data.message ||
+          data.error ||
+          "Failed to create task.",
+          "error"
+        );
       }
-    });
+    }
+  );
 
-    // Toggle Task Completion
-    window.toggleTask = async function (id, currentStatus) {
-      const res = await authFetch(`/tasks/${id}`, {
-        method: "PUT",
-        body: JSON.stringify({ completed: !currentStatus }),
-      });
 
-      if (res && res.ok) {
-        loadTasks();
-      } else if (res) {
-        const data = await res.json();
-        showAlert(data.message || "Failed to update task.", "error");
+  // -----------------------------
+  // UPDATE TASK
+  // Backend:
+  // PUT /tasks/:id
+  // -----------------------------
+
+  window.toggleTask =
+    async function (
+      id,
+      currentStatus
+    ) {
+
+      const response =
+        await authFetch(
+          `/tasks/${id}`,
+          {
+            method: "PUT",
+
+            body: JSON.stringify({
+              completed:
+                !currentStatus
+            })
+          }
+        );
+
+      if (!response) {
+        return;
+      }
+
+      if (response.ok) {
+
+        showAlert(
+          "Task updated successfully!",
+          "success"
+        );
+
+        await loadTasks();
+
+      } else {
+
+        const data =
+          await response.json()
+            .catch(() => ({}));
+
+        showAlert(
+          data.message ||
+          data.error ||
+          "Failed to update task.",
+          "error"
+        );
       }
     };
 
-    // Delete Task
-    window.deleteTask = async function (id) {
-      const res = await authFetch(`/tasks/${id}`, {
-        method: "DELETE",
-      });
 
-      if (res && res.ok) {
-        loadTasks();
-      } else if (res) {
-        const data = await res.json();
-        showAlert(data.message || "Failed to delete task.", "error");
+  // -----------------------------
+  // DELETE TASK
+  // Backend:
+  // DELETE /tasks/:id
+  // -----------------------------
+
+  window.deleteTask =
+    async function (id) {
+
+      const response =
+        await authFetch(
+          `/tasks/${id}`,
+          {
+            method: "DELETE"
+          }
+        );
+
+      if (!response) {
+        return;
+      }
+
+      if (response.ok) {
+
+        showAlert(
+          "Task deleted successfully!",
+          "success"
+        );
+
+        await loadTasks();
+
+      } else {
+
+        const data =
+          await response.json()
+            .catch(() => ({}));
+
+        showAlert(
+          data.message ||
+          data.error ||
+          "Failed to delete task.",
+          "error"
+        );
       }
     };
 
-    // Helper: Escape HTML for security
-    function escapeHtml(text) {
-      if (!text) return "";
-      return text
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
+
+  // -----------------------------
+  // ESCAPE HTML
+  // -----------------------------
+
+  function escapeHtml(text) {
+
+    if (!text) {
+      return "";
     }
 
-    // Init: Check existing session on load
-    window.addEventListener("DOMContentLoaded", async () => {
-      const token = getToken();
+    return String(text)
+      .replace(
+        /&/g,
+        "&amp;"
+      )
+      .replace(
+        /</g,
+        "&lt;"
+      )
+      .replace(
+        />/g,
+        "&gt;"
+      )
+      .replace(
+        /"/g,
+        "&quot;"
+      )
+      .replace(
+        /'/g,
+        "&#039;"
+      );
+  }
+
+
+  // -----------------------------
+  // CHECK EXISTING SESSION
+  // Backend:
+  // GET /auth/me
+  // -----------------------------
+
+  window.addEventListener(
+    "DOMContentLoaded",
+    async () => {
+
+      const token =
+        getToken();
+
       if (token) {
-        // Verify with /me
-        const res = await authFetch("/me", { method: "GET" });
-        if (res && res.ok) {
-          const data = await res.json();
-          showDashboardUI(data.user ? data.user.email : localStorage.getItem("userEmail"));
+
+        const response =
+          await authFetch(
+            "/auth/me",
+            {
+              method: "GET"
+            }
+          );
+
+        if (
+          response &&
+          response.ok
+        ) {
+
+          const data =
+            await response.json();
+
+          const email =
+            data.user &&
+            data.user.email
+              ? data.user.email
+              : localStorage.getItem(
+                  "userEmail"
+                );
+
+          showDashboardUI(
+            email
+          );
+
         } else {
+
           handleLogout();
         }
+
       } else {
+
         showAuthUI("login");
       }
-    });
-  </script>
+    }
+  );
+
+</script>
+
 </body>
 </html>
+```
