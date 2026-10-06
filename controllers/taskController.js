@@ -1,4 +1,5 @@
 const Task = require("../models/Task");
+const taskEvents = require("../events");
 
 // @desc    Get all tasks for logged-in user (sorted newest first)
 // @route   GET /tasks
@@ -26,7 +27,12 @@ const createTask = async (req, res, next) => {
       user: req.user.id,
     });
 
-    return res.status(201).json(task);
+    const apiTimestamp = new Date().toISOString();
+    console.log(`[API Response] Task created at ${apiTimestamp}`);
+    res.status(201).json(task);
+
+    taskEvents.emit("task-created", { task, apiTimestamp });
+    return;
   } catch (err) {
     next(err);
   }
@@ -78,9 +84,14 @@ const deleteTask = async (req, res, next) => {
       });
     }
 
-    return res.status(200).json({
+    const apiTimestamp = new Date().toISOString();
+    console.log(`[API Response] Task deleted at ${apiTimestamp}`);
+    res.status(200).json({
       message: "Task deleted successfully",
     });
+
+    taskEvents.emit("task-deleted", { task, apiTimestamp });
+    return;
   } catch (err) {
     next(err);
   }

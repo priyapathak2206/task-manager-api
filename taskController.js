@@ -1,5 +1,6 @@
 const Task = require("../models/Task");
 const { cache, getCache, getStats } = require("../utils/cache");
+const taskEvents = require("./events");
 
 const getTasksCacheKey = (userId) => `tasks:${userId}`;
 
@@ -48,7 +49,12 @@ const createTask = async (req, res, next) => {
     // Invalidate cached task list
     cache.del(getTasksCacheKey(req.user.id));
 
-    return res.status(201).json(task);
+    const apiTimestamp = new Date().toISOString();
+    console.log(`[API Response] Task created at ${apiTimestamp}`);
+    res.status(201).json(task);
+
+    taskEvents.emit("task-created", { task, apiTimestamp });
+    return;
   } catch (err) {
     next(err);
   }
@@ -106,9 +112,14 @@ const deleteTask = async (req, res, next) => {
     // Invalidate cached task list
     cache.del(getTasksCacheKey(req.user.id));
 
-    return res.status(200).json({
+    const apiTimestamp = new Date().toISOString();
+    console.log(`[API Response] Task deleted at ${apiTimestamp}`);
+    res.status(200).json({
       message: "Task deleted successfully",
     });
+
+    taskEvents.emit("task-deleted", { task, apiTimestamp });
+    return;
   } catch (err) {
     next(err);
   }

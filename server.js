@@ -24,6 +24,9 @@ app.use((req, res, next) => {
 app.use("/auth", authRoutes);
 app.use("/tasks", taskRoutes);
 
+// Load Event Listeners
+require("./listeners");
+
 // Centralized Error Handler (MUST be the last middleware)
 app.use(errorHandler);
 
