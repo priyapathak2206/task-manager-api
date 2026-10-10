@@ -1,11 +1,9 @@
+process.env.JWT_SECRET = process.env.JWT_SECRET || "test_jwt_secret_key";
+
 const request = require("supertest");
 const app = require("../app");
 
 describe("Authentication & Authorization Middleware API Tests", () => {
-  beforeAll(() => {
-    // Ensure JWT_SECRET is set for tests
-    process.env.JWT_SECRET = process.env.JWT_SECRET || "test_jwt_secret_key";
-  });
 
   test("GET /tasks without Authorization token should return HTTP 401", async () => {
     const response = await request(app).get("/tasks");
