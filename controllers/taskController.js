@@ -1,4 +1,4 @@
-const Task = require("../models/Task");
+const Task = require("../models/task");
 const taskEvents = require("../events");
 
 // @desc    Get all tasks for logged-in user (sorted newest first)
