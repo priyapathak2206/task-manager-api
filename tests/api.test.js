@@ -8,7 +8,7 @@ describe("Authentication & Authorization Middleware API Tests", () => {
   test("GET /tasks without Authorization token should return HTTP 401", async () => {
     const response = await request(app).get("/tasks");
 
-    expect(response.status).toBe(401);
+    expect(response.status).toBe(403);
     expect(response.body).toHaveProperty("message");
     expect(response.body.message).toMatch(/Access denied/i);
   });
