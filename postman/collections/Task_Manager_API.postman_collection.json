@@ -344,6 +344,55 @@
           "path": ["tasks"]
         }
       }
+    },
+    {
+      "name": "9. Generate Task Description (AI)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200 OK\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "pm.test(\"Response has description and disclaimer\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData).to.have.property(\"description\");",
+              "    pm.expect(jsonData).to.have.property(\"disclaimer\");",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"Write documentation\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/ai/generate-description",
+          "host": ["{{baseUrl}}"],
+          "path": ["api","ai","generate-description"]
+        }
+      }
     }
   ]
 }

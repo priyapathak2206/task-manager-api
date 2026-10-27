@@ -9,6 +9,7 @@ const cors = require("cors");
 
 const authRoutes = require("./routes/authRoutes");
 const taskRoutes = require("./routes/taskRoutes");
+const aiRoutes = require("./routes/aiRoutes");
 const errorHandler = require("./middleware/errorHandler");
 
 const app = express();
@@ -27,6 +28,7 @@ app.use((req, res, next) => {
 // Route Mounts
 app.use("/auth", authRoutes);
 app.use("/tasks", taskRoutes);
+app.use("/api/ai", aiRoutes);
 
 // Load Event Listeners
 require("./listeners");

@@ -219,6 +219,43 @@
     .hidden {
       display: none !important;
     }
+    .btn-ai {
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      color: white;
+      border: none;
+      padding: 0.35rem 0.75rem;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      transition: all 0.2s ease;
+    }
+    .btn-ai:hover {
+      opacity: 0.9;
+      transform: translateY(-1px);
+    }
+    .btn-ai:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+    .ai-disclaimer {
+      margin-top: 0.5rem;
+      font-size: 0.825rem;
+      color: #a7f3d0;
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid rgba(16, 185, 129, 0.25);
+      padding: 0.45rem 0.75rem;
+      border-radius: 6px;
+    }
+    .ai-disclaimer.error {
+      color: #fca5a5;
+      background: rgba(239, 68, 68, 0.1);
+      border-color: rgba(239, 68, 68, 0.25);
+    }
    .header-subtitle { margin-top: 0.35rem; color: var(--text-muted); font-size: 0.9rem; } .user-pill { display:flex; align-items:center; gap:0.8rem; background:transparent; padding:0; } .user-pill span { color:var(--text-muted); font-size:0.9rem; } .btn-logout { background:transparent; color:#f87171; border:1px solid #f87171; padding:0.45rem 0.85rem; border-radius:7px; cursor:pointer; font-weight:600; transition:0.2s; } .btn-logout:hover { background:#f87171; color:white; }
 </style>
 </head>
@@ -353,13 +390,26 @@
 
         <div class="form-group">
 
-          <label for="taskDesc">Description (Optional)</label>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
+            <label for="taskDesc" style="margin-bottom: 0;">Description (Optional)</label>
+            <button
+              type="button"
+              id="generateAiDescBtn"
+              class="btn-ai"
+            >
+              ✨ Generate Description
+            </button>
+          </div>
 
           <textarea
             id="taskDesc"
             class="form-control"
             placeholder="Add additional details..."
           ></textarea>
+
+          <div id="aiNotice" class="ai-disclaimer hidden">
+            ✨ AI-generated suggestion — review and edit before saving.
+          </div>
 
         </div>
 
@@ -416,6 +466,8 @@
   const loginForm = document.getElementById("loginForm");
   const registerForm = document.getElementById("registerForm");
   const createTaskForm = document.getElementById("createTaskForm");
+  const generateAiDescBtn = document.getElementById("generateAiDescBtn");
+  const aiNotice = document.getElementById("aiNotice");
 
   const taskList = document.getElementById("taskList");
   const emptyState = document.getElementById("emptyState");
@@ -1021,6 +1073,7 @@
       if (response.ok) {
 
         createTaskForm.reset();
+        if (aiNotice) aiNotice.classList.add("hidden");
 
         showAlert(
           "Task created successfully!",
@@ -1040,6 +1093,71 @@
       }
     }
   );
+
+
+  // -----------------------------
+  // GENERATE AI DESCRIPTION
+  // Backend:
+  // POST /api/ai/generate-description
+  // -----------------------------
+
+  if (generateAiDescBtn) {
+    generateAiDescBtn.addEventListener("click", async () => {
+      const titleInput = document.getElementById("taskTitle");
+      const descTextarea = document.getElementById("taskDesc");
+      const title = titleInput ? titleInput.value.trim() : "";
+
+      if (!title) {
+        showAlert("Please enter a task title first to generate an AI description.", "error");
+        return;
+      }
+
+      generateAiDescBtn.disabled = true;
+      generateAiDescBtn.textContent = "⏳ Generating...";
+      if (aiNotice) {
+        aiNotice.classList.add("hidden");
+        aiNotice.classList.remove("error");
+      }
+
+      try {
+        const response = await authFetch("/api/ai/generate-description", {
+          method: "POST",
+          body: JSON.stringify({ title })
+        });
+
+        if (!response) {
+          generateAiDescBtn.disabled = false;
+          generateAiDescBtn.textContent = "✨ Generate Description";
+          return;
+        }
+
+        const data = await response.json().catch(() => ({}));
+
+        if (response.ok && data.description) {
+          descTextarea.value = data.description;
+          if (aiNotice) {
+            aiNotice.textContent = "✨ " + (data.disclaimer || "AI-generated suggestion — review and edit before saving.");
+            aiNotice.classList.remove("hidden", "error");
+          }
+        } else {
+          const errorMsg = data.message || data.error || "Failed to generate AI description. Please write one manually.";
+          if (aiNotice) {
+            aiNotice.textContent = errorMsg;
+            aiNotice.classList.add("error");
+            aiNotice.classList.remove("hidden");
+          } else {
+            showAlert(errorMsg, "error");
+          }
+        }
+      } catch (err) {
+        console.error("AI Generation Error:", err);
+        showAlert("Failed to connect to AI generator. You can write your own description.", "error");
+      } finally {
+        generateAiDescBtn.disabled = false;
+        generateAiDescBtn.textContent = "✨ Generate Description";
+      }
+    });
+  }
 
 
   // -----------------------------
