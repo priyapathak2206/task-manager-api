@@ -9,6 +9,9 @@ router.use(auth);
 
 // Task Routes
 router.get("/", taskController.getTasks);
+router.get("/cache-stats", taskController.getCacheStats);
+router.post("/cache-clear", taskController.clearCache);
+
 router.post("/", validateTaskInput, taskController.createTask);
 router.put("/:id", validateTaskInput, taskController.updateTask);
 router.delete("/:id", taskController.deleteTask);
